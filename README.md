@@ -1,1 +1,2 @@
-# DevOps2
+# DevOps
+This Repo contains shared code for CI/CD
