@@ -23,6 +23,7 @@ jobs:
     env:
       AZURE_ARTIFACTS_ENV_ACCESS_TOKEN: ${{ secrets.AZURE_ARTIFACTS_ENV_ACCESS_TOKEN }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      ARTIFACT_TOKEN: ${{ secrets.ARTIFACT_TOKEN }}
 
     steps:
     - name: Setup java
