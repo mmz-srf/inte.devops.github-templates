@@ -9,6 +9,9 @@ on:
       createContainer:
         type: boolean
         default: false
+      skipJacocoReport:
+        type: boolean
+        default: false
       javaVersion:
         type: number
         default: 11
@@ -29,12 +32,16 @@ jobs:
         java-version: ${{ inputs.javaVersion }}
     - name: Setup gradle
       uses: gradle/gradle-build-action@v2
-      
+
     - name: Checkout project sources
       uses: actions/checkout@v3
-      
-    - name: Build & test project
+
+    - name: Build, test & code coverage
+      if: inputs.skipJacocoReport == false
       run: ./gradlew clean build test jacocoTestReport --info
+    - name: Build, test without code coverage
+      if: inputs.skipJacocoReport == true
+      run: ./gradlew clean build test --info
 
     - name: SonarQube Scan
       if: github.ref == 'refs/heads/master'
