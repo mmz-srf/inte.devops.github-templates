@@ -2,8 +2,7 @@ name: Release
 run-name: Release ${{ inputs.version }} on ${{ inputs.environment }}
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+  workflow_call:
     inputs:
       environment:
         description: 'Deployment environment'
@@ -25,14 +24,17 @@ on:
       enableTracing:
         type: boolean
         default: true
+      kubernetesUrl:
+        type: string
+        required: true
+      kubernetesSecret:
+        type: string
+        required: true
 
 jobs:
   deploy-to-cluster:
     runs-on: srf-inte-cargo-test
     timeout-minutes: 10
-    env:
-      AZURE_ARTIFACTS_ENV_ACCESS_TOKEN: ${{ secrets.AZURE_ARTIFACTS_ENV_ACCESS_TOKEN }}
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout project sources
@@ -69,8 +71,8 @@ jobs:
         uses: azure/k8s-set-context@v3
         with:
           method: service-account
-          k8s-url: https://srfop-test.cargo.stxt.media.int # TBD: TEST / PROD
-          k8s-secret: ${{ secrets.INTE_CARGO_TEST }}  # TBD: TEST / PROD
+          k8s-url: ${{ inputs.kubernetesUrl }}
+          k8s-secret: ${{ inputs.kubernetesSecret }}
 
       - name: Deploy app to cluster
         uses: Azure/k8s-deploy@v4
