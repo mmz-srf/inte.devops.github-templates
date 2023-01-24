@@ -6,10 +6,7 @@ on:
     inputs:
       environment:
         description: 'Deployment environment'
-        type: choice
-        options:
-          - test
-          - prod
+        type: string
         default: test
       version:
         description: 'Release version'
