@@ -66,8 +66,8 @@ jobs:
         uses: azure/k8s-set-context@v3
         with:
           method: service-account
-          k8s-url: '${{ secrets.INTE_CARGO_URL }}'
-          k8s-secret: '${{ secrets.INTE_CARGO_SECRET }}}'
+          k8s-url: ${{ secrets.INTE_CARGO_URL }}
+          k8s-secret: ${{ secrets.INTE_CARGO_SECRET }}
 
       - name: Deploy app to cluster
         uses: Azure/k8s-deploy@v4
