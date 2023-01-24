@@ -1,0 +1,84 @@
+name: Release
+run-name: Release ${{ inputs.version }} on ${{ inputs.environment }}
+
+on:
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Deployment environment'
+        type: choice
+        options:
+          - test
+          - prod
+        default: test
+      version:
+        description: 'Release version'
+        type: string
+        required: true
+      serviceName:
+        type: string
+        required: true
+      deploymentNamespace:
+        type: string
+        required: true
+      enableTracing:
+        type: boolean
+        default: true
+
+jobs:
+  deploy-to-cluster:
+    runs-on: srf-inte-cargo-test
+    timeout-minutes: 10
+    env:
+      AZURE_ARTIFACTS_ENV_ACCESS_TOKEN: ${{ secrets.AZURE_ARTIFACTS_ENV_ACCESS_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: Checkout project sources
+        uses: actions/checkout@v3
+
+      - name: Set environment specific variables
+        run: |
+          if [ "test" == "${{ inputs.environment }}" ]
+          then
+            echo "inte-domain=inte-test.media.int" >> $GITHUB_ENV
+          elif [ "prod" == "${{ inputs.environment }}" ]
+          then
+            echo "inte-domain=inte.media.int" >> $GITHUB_ENV
+          else
+            echo "Error: Unknown environment"
+            exit 1
+          fi
+
+      - name: Replace token in manifest
+        uses: cschleiden/replace-tokens@v1
+        with:
+          tokenPrefix: '#{'
+          tokenSuffix: '}#'
+          files: '["./deployment/*.yaml"]'
+        env:
+          environment: ${{ inputs.environment }}
+          version: ${{ inputs.version }}
+          enableTracing: ${{ inputs.enableTracing }}
+
+      - name: Print file for debugging
+        run: cat ./deployment/deploy.yaml
+
+      - name: Login to cluster with service-account
+        uses: azure/k8s-set-context@v3
+        with:
+          method: service-account
+          k8s-url: https://srfop-test.cargo.stxt.media.int # TBD: TEST / PROD
+          k8s-secret: ${{ secrets.INTE_CARGO_TEST }}  # TBD: TEST / PROD
+
+      - name: Deploy app to cluster
+        uses: Azure/k8s-deploy@v4
+        with:
+          namespace: '${{ inputs.deploymentNamespace }}'
+
+          action: deploy
+          private-cluster: false
+          manifests: |
+            ./deployment/
+          images: 'registry.swisstxt.ch/srfop-proj-inte/${{ inputs.serviceName }}:${{ inputs.version }}'
