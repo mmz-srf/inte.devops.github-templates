@@ -21,7 +21,11 @@ on:
       enableTracing:
         type: boolean
         default: true
-
+    secrets:
+      INTE_CARGO_URL:
+        required: true
+      INTE_CARGO_SECRET:
+        required: true
 jobs:
   deploy-to-cluster:
     runs-on: srf-inte-cargo-test
