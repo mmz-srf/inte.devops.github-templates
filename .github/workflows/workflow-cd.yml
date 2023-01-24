@@ -21,12 +21,6 @@ on:
       enableTracing:
         type: boolean
         default: true
-      kubernetesUrl:
-        type: string
-        required: true
-      kubernetesSecret:
-        type: string
-        required: true
 
 jobs:
   deploy-to-cluster:
@@ -68,8 +62,8 @@ jobs:
         uses: azure/k8s-set-context@v3
         with:
           method: service-account
-          k8s-url: ${{ inputs.kubernetesUrl }}
-          k8s-secret: ${{ inputs.kubernetesSecret }}
+          k8s-url: ${{ secrets.INTE_CARGO_URL }}
+          k8s-secret: ${{ secrets.INTE_CARGO_SECRET }}}
 
       - name: Deploy app to cluster
         uses: Azure/k8s-deploy@v4
