@@ -14,7 +14,7 @@ on:
         default: false
       javaVersion:
         type: number
-        default: 11
+        default: 17
 
 jobs:
   gradle-build-test:
