@@ -28,7 +28,7 @@ on:
         required: true
 jobs:
   deploy-to-cluster:
-    runs-on: srf-inte-cargo-test
+    runs-on: srf-inte-cargo
     timeout-minutes: 10
 
     steps:
