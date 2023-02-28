@@ -45,7 +45,6 @@ jobs:
       run: ./gradlew clean build test --info
 
     - name: SonarQube Scan
-      if: github.ref == 'refs/heads/master'
       uses: sonarsource/sonarqube-scan-action@master
       env:
         SONAR_HOST_URL: https://sonarcloud.io
