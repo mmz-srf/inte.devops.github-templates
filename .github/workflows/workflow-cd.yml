@@ -21,6 +21,9 @@ on:
       enableTracing:
         type: boolean
         default: true
+      deploymentManifestsDirectory:
+        type: string
+        default: "./deployment"
     secrets:
       INTE_CARGO_URL:
         required: true
@@ -53,14 +56,14 @@ jobs:
         with:
           tokenPrefix: '#{'
           tokenSuffix: '}#'
-          files: '["./deployment/*.yaml"]'
+          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml"]'
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
           enableTracing: ${{ inputs.enableTracing }}
 
       - name: Print file for debugging
-        run: cat ./deployment/deploy.yaml
+        run: cat ${{ inputs.deploymentManifestsDirectory }}/deploy.yaml
 
       - name: Login to cluster with service-account
         uses: azure/k8s-set-context@v3
@@ -73,9 +76,8 @@ jobs:
         uses: Azure/k8s-deploy@v4
         with:
           namespace: '${{ inputs.deploymentNamespace }}'
-
           action: deploy
           private-cluster: false
           manifests: |
-            ./deployment/
+            ${{ inputs.deploymentManifestsDirectory }}/
           images: 'registry.swisstxt.ch/srfop-proj-inte/${{ inputs.serviceName }}:${{ inputs.version }}'

@@ -15,6 +15,18 @@ on:
       javaVersion:
         type: number
         default: 17
+      gradleBuildTasks:
+        type: string
+        default: "clean build test jacocoTestReport --info"
+      gradleBuildTasksSkipCoverage:
+        type: string
+        default: "clean build test --info"
+      gradlePublishJarTasks:
+        type: string
+        default: "publish"
+      gradleDockerTasks:
+        type: string
+        default: "dockerPush"
 
 jobs:
   gradle-build-test:
@@ -39,10 +51,10 @@ jobs:
 
     - name: Build, test & code coverage
       if: inputs.skipJacocoReport == false
-      run: ./gradlew clean build test jacocoTestReport --info
+      run: ./gradlew ${{ inputs.gradleBuildTasks }}
     - name: Build, test without code coverage
       if: inputs.skipJacocoReport == true
-      run: ./gradlew clean build test --info
+      run: ./gradlew ${{ inputs.gradleBuildTasksSkipCoverage }}
 
     - name: SonarQube Scan
       uses: sonarsource/sonarqube-scan-action@master
@@ -52,7 +64,7 @@ jobs:
 
     - name: Publish jar
       if: startsWith(github.ref, 'refs/tags/') && inputs.publishJar
-      run: ./gradlew publish
+      run: ./gradlew ${{ inputs.gradlePublishJarTasks }}
 
     - name: Login to STXT Registry
       if: startsWith(github.ref, 'refs/tags/') && inputs.createContainer
@@ -64,4 +76,4 @@ jobs:
 
     - name: Create docker container
       if: startsWith(github.ref, 'refs/tags/') && inputs.createContainer
-      run: ./gradlew dockerPush
+      run: ./gradlew ${{ inputs.gradleDockerTasks }}
