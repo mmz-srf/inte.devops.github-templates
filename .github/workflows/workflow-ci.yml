@@ -56,11 +56,24 @@ jobs:
       if: inputs.skipJacocoReport == true
       run: ./gradlew ${{ inputs.gradleBuildTasksSkipCoverage }}
 
-    - name: SonarQube Scan
-      uses: sonarsource/sonarqube-scan-action@master
+    - name: Sonar (with test coverage)
+      if: inputs.skipJacocoReport == false
+      run: ./gradlew sonar -Pcoverage
       env:
-        SONAR_HOST_URL: https://sonarcloud.io
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Sonar (without test coverage)
+      if: inputs.skipJacocoReport == true
+      run: ./gradlew sonar
+      env:
+        SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    #- name: SonarQube Scan
+    #  uses: sonarsource/sonarqube-scan-action@master
+    #  env:
+    #    SONAR_HOST_URL: https://sonarcloud.io
+    #    SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
 
     - name: Publish jar
       if: startsWith(github.ref, 'refs/tags/') && inputs.publishJar
