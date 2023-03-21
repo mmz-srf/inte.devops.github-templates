@@ -9,18 +9,15 @@ on:
       createContainer:
         type: boolean
         default: false
-      skipJacocoReport:
+      testCoverage:
         type: boolean
-        default: false
+        default: true
       javaVersion:
         type: number
         default: 17
       gradleBuildTasks:
         type: string
-        default: "clean build test jacocoTestReport --info"
-      gradleBuildTasksSkipCoverage:
-        type: string
-        default: "clean build test --info"
+        default: "--info clean build test --info"
       gradlePublishJarTasks:
         type: string
         default: "publish"
@@ -50,11 +47,11 @@ jobs:
       uses: actions/checkout@v3
 
     - name: Build, test & code coverage
-      if: inputs.skipJacocoReport == false
-      run: ./gradlew ${{ inputs.gradleBuildTasks }}
+      if: inputs.testCoverage == true
+      run: ./gradlew ${{ inputs.gradleBuildTasks }} jacocoTestReport
     - name: Build, test without code coverage
-      if: inputs.skipJacocoReport == true
-      run: ./gradlew ${{ inputs.gradleBuildTasksSkipCoverage }}
+      if: inputs.testCoverage == false
+      run: ./gradlew ${{ inputs.gradleBuildTasks }}
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
       with:
@@ -65,23 +62,17 @@ jobs:
           **/test-results/**/*.json
 
     - name: Sonar (with test coverage)
-      if: inputs.skipJacocoReport == false
+      if: inputs.testCoverage == true
       run: ./gradlew sonar -Pcoverage --info
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Sonar (without test coverage)
-      if: inputs.skipJacocoReport == true
+      if: inputs.testCoverage == false
       run: ./gradlew sonar --info
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    #- name: SonarQube Scan
-    #  uses: sonarsource/sonarqube-scan-action@master
-    #  env:
-    #    SONAR_HOST_URL: https://sonarcloud.io
-    #    SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
 
     - name: Publish jar
       if: startsWith(github.ref, 'refs/tags/') && inputs.publishJar
