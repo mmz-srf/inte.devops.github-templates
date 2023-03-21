@@ -35,16 +35,23 @@ jobs:
       AZURE_ARTIFACTS_ENV_ACCESS_TOKEN: ${{ secrets.INTE_AZURE_ARTIFACT_TOKEN }}
 
     steps:
-    - name: Setup java
+    - name: Checkout Project Sources
+      uses: actions/checkout@v3
+
+    - name: Setup Java
       uses: actions/setup-java@v3
       with:
         distribution: temurin
         java-version: ${{ inputs.javaVersion }}
-    - name: Setup gradle
+        cache: 'gradle'
+    - name: Setup Gradle
       uses: gradle/gradle-build-action@v2
-
-    - name: Checkout project sources
-      uses: actions/checkout@v3
+    - name: Setup Cache for SonarCloud
+      uses: actions/cache@v3
+      with:
+        path: ~/.sonar/cache
+        key: ${{ runner.os }}-sonar
+        restore-keys: ${{ runner.os }}-sonar
 
     - name: Build, test & code coverage
       if: inputs.testCoverage == true
