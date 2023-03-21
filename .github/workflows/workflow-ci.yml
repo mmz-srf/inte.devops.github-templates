@@ -56,13 +56,12 @@ jobs:
       if: inputs.skipJacocoReport == true
       run: ./gradlew ${{ inputs.gradleBuildTasksSkipCoverage }}
 
-    - uses: dorny/test-reporter@v1
+    - uses: EnricoMi/publish-unit-test-result-action@v2
       with:
-        artifact: test-results
-        name: Test Results
-        reporter: java-junit
-        path: '*.xml'
-        fail-on-error: false
+        files: |
+          test-results/**/*.xml
+          test-results/**/*.trx
+          test-results/**/*.json
 
     - name: Sonar (with test coverage)
       if: inputs.skipJacocoReport == false
