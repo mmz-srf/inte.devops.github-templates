@@ -59,12 +59,16 @@ jobs:
     - name: Sonar (with test coverage)
       if: inputs.skipJacocoReport == false
       run: ./gradlew sonar -Pcoverage
+      permissions:
+        pull-requests: read
       env:
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Sonar (without test coverage)
       if: inputs.skipJacocoReport == true
       run: ./gradlew sonar
+      permissions:
+        pull-requests: read
       env:
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
