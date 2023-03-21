@@ -60,7 +60,7 @@ jobs:
       with:
         artifact: test-results
         name: Test Results
-        path: 'build/test-results/test/*.xml'
+        path: '**/build/test-results/test/*.xml'
         reporter: java-junit
 
     - name: Sonar (with test coverage)
