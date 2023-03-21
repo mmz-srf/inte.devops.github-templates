@@ -28,6 +28,10 @@ on:
         type: string
         default: "dockerPush"
 
+permissions:
+  contents: read
+  pull-requests: read
+
 jobs:
   gradle-build-test:
     runs-on: ubuntu-latest
@@ -58,17 +62,13 @@ jobs:
 
     - name: Sonar (with test coverage)
       if: inputs.skipJacocoReport == false
-      run: ./gradlew sonar -Pcoverage
-      permissions:
-        pull-requests: read
+      run: ./gradlew sonar -Pcoverage --info
       env:
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     - name: Sonar (without test coverage)
       if: inputs.skipJacocoReport == true
-      run: ./gradlew sonar
-      permissions:
-        pull-requests: read
+      run: ./gradlew sonar --info
       env:
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
