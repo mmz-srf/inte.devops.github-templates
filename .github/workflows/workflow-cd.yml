@@ -62,9 +62,6 @@ jobs:
           version: ${{ inputs.version }}
           enableTracing: ${{ inputs.enableTracing }}
 
-      - name: Print file for debugging
-        run: cat ${{ inputs.deploymentManifestsDirectory }}/deploy.yaml
-
       - name: Login to cluster with service-account
         uses: azure/k8s-set-context@v3
         with:
