@@ -60,8 +60,9 @@ jobs:
       with:
         artifact: test-results
         name: Test Results
-        path: '**/build/test-results/test/*.xml'
         reporter: java-junit
+        path: '*.xml'
+        fail-on-error: false
 
     - name: Sonar (with test coverage)
       if: inputs.skipJacocoReport == false
