@@ -58,10 +58,11 @@ jobs:
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
       with:
+        comment_mode: failures
         files: |
-          test-results/**/*.xml
-          test-results/**/*.trx
-          test-results/**/*.json
+          **/test-results/**/*.xml
+          **/test-results/**/*.trx
+          **/test-results/**/*.json
 
     - name: Sonar (with test coverage)
       if: inputs.skipJacocoReport == false
