@@ -17,7 +17,7 @@ on:
         default: 17
       gradleBuildTasks:
         type: string
-        default: "--info clean build test --info"
+        default: "--info clean build test"
       gradlePublishJarTasks:
         type: string
         default: "publish"
