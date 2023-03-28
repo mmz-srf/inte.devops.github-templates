@@ -9,9 +9,6 @@ on:
       createContainer:
         type: boolean
         default: false
-      testCoverage:
-        type: boolean
-        default: true
       javaVersion:
         type: number
         default: 17
@@ -48,11 +45,7 @@ jobs:
       uses: gradle/gradle-build-action@v2
 
     ## Build
-    - name: Build, test & code coverage
-      if: inputs.testCoverage == true
-      run: ./gradlew ${{ inputs.gradleBuildTasks }} jacocoTestReport
-    - name: Build, test without code coverage
-      if: inputs.testCoverage == false
+    - name: Build & Test
       run: ./gradlew ${{ inputs.gradleBuildTasks }}
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
@@ -70,15 +63,8 @@ jobs:
         path: ~/.sonar/cache
         key: ${{ runner.os }}-sonar
         restore-keys: ${{ runner.os }}-sonar
-    - name: Sonar (with test coverage)
-      if: inputs.testCoverage == true
+    - name: Sonar
       run: ./gradlew sonar -Pcoverage --info
-      env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Sonar (without test coverage)
-      if: inputs.testCoverage == false
-      run: ./gradlew sonar --info
       env:
         SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
