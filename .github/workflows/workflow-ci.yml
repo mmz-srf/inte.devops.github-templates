@@ -49,6 +49,7 @@ jobs:
       run: ./gradlew ${{ inputs.gradleBuildTasks }}
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
+      if: always()
       with:
         comment_mode: failures
         files: |
