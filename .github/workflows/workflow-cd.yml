@@ -56,7 +56,7 @@ jobs:
         with:
           tokenPrefix: '#{'
           tokenSuffix: '}#'
-          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml"]'
+          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml"]'
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
