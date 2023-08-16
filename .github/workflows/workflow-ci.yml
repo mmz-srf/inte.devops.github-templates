@@ -67,7 +67,7 @@ jobs:
     - name: Sonar
       run: ./gradlew sonar -Pcoverage --info
       env:
-        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     ## Publishing
