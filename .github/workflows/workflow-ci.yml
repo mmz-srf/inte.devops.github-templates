@@ -72,7 +72,7 @@ jobs:
 
     ## Git-Status (for Debugging)
     - name: Print Git-Status
-      run: git status
+      run: git status && git diff
 
     ## Publishing
     - name: Publish jar
