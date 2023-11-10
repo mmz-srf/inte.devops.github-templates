@@ -70,6 +70,10 @@ jobs:
         SONAR_TOKEN: ${{ secrets.INTE_SONAR_TOKEN }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    ## Git-Status (for Debugging)
+    - name: Print Git-Status
+      run: git status
+
     ## Publishing
     - name: Publish jar
       if: startsWith(github.ref, 'refs/tags/') && inputs.publishJar
