@@ -1,3 +1,34 @@
-/.idea/
-*.iml
+# Build directories
+**/target/
+**/build/
+**/bin/
+
+# Gradle
+.gradle/
+
+# Package Files #
+*.jar
+!*gradle-wrapper.jar        # include gradle-wrapper
+*.zip
+*.tar.gz
+*.rar
+
+# Log files
+*.log
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+replay_pid*
+
+# Github runner: Produced by sonarsource/sonarqube-scan-action
+.scannerwork/
+
+# osx
 .DS_Store
+
+# IntelliJ
+.idea/
+!.idea/runConfigurations/*      # include runConfigurations
+out/
+*.iml
+*.iws
