@@ -1,0 +1,69 @@
+name: Release
+run-name: Release ${{ inputs.version }} on ${{ inputs.ansibleInventory }}
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: 'Release version'
+        type: string
+        required: true
+      repositoryPath:
+        description: 'The path to the relative jfrog directory specific to the artifact'
+        type: string
+        required: true
+      targetJarName:
+        description: 'Filename of the jar executed by nssm'
+        type: string
+        required: true
+      ansibleInventory:
+        description: 'Variable relating to list of hosts in ansible inventory'
+        type: string
+        required: true
+      windowsServiceName:
+        description: 'Name of the prepared service with nssm on each host'
+        type: string
+        required: true
+      windowsAppDirectory:
+        description: 'Name of the app directory prepared on each host'
+        type: string
+        required: true
+    secrets:
+      INTE_JFROG_ARTIFACT_TOKEN:
+        required: true
+      INTE_ANSIBLE_VAULT_PASSWORD:
+        required: true
+
+jobs:
+  deploy-to-vm:
+    runs-on: srf-inte-cargo
+    timeout-minutes: 10
+    env:
+      ARTIFACT_TEMP_PATH: /home/github-runner/ansible/artifacts/${{ inputs.windowsServiceName }}/${{ inputs.version }}/${{ inputs.targetJarName }}
+    steps:
+
+      - name: Download JAR
+        uses: jfrog/setup-jfrog-cli@v3
+        env:
+          JF_URL: https://maven.admin.srf.ch
+          JF_ACCESS_TOKEN: ${{ secrets.INTE_JFROG_ARTIFACT_TOKEN }}
+
+      - run: |
+          jf rt dl ${{ inputs.repositoryPath }}/${{ inputs.version }}/*.jar $ARTIFACT_TEMP_PATH --flat --limit=1
+
+      - name: Run Deployment
+        uses: dawidd6/action-ansible-playbook@v2
+        with:
+          directory: /home/github-runner/ansible
+          playbook: playbook.yaml
+          vault_password: ${{secrets.INTE_ANSIBLE_VAULT_PASSWORD}}
+          options: |
+            --inventory inventory.yaml
+            --extra-vars "inventory_group_of_hosts=${{ inputs.ansibleInventory }} windows_service_name=${{ inputs.windowsServiceName }} jar_source_path=${{ env.ARTIFACT_TEMP_PATH }} artifact_version=${{ inputs.version }} target_jar_name=${{ inputs.targetJarName }} local_app_path=${{ inputs.windowsAppDirectory }}"
+            --verbose
+
+      - name: Remove JAR from Runner when deployed
+        uses: JesseTG/rm@v1.0.3
+        with:
+          path: $ARTIFACT_TEMP_PATH
+
