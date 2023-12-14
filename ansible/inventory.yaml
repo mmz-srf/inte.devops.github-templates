@@ -1,0 +1,51 @@
+inte_vms:
+  children:
+
+    test_vms:
+      children:
+
+        fileoperation_workers_test:
+          hosts:
+            10.135.8.59:
+
+        watch_service_test:
+          hosts:
+            10.135.8.85:
+      vars:
+        inte_service_user_test_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38626430383839643163386634376635366463616636323336663164353865613663353465383762
+          6364356562666233333062316531326339363164363063660a316466376432306330316632393662
+          30363838383834363636646336636464333635376130353939643362383230343539646436663235
+          3134313439353865380a353836636638393861633634656363313031643265616335313163383135
+          3965
+        ansible_user: svc-srf-INTTU
+        ansible_password: "{{inte_service_user_test_password}}"
+
+    prod_vms:
+      children:
+
+        fileoperation_workers_prod:
+          hosts:
+            10.135.8.60:
+            10.135.8.91:
+
+        watch_service_prod:
+          hosts:
+            10.135.8.84:
+
+      vars:
+        inte_service_user_prod_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          63313135383137613534363239323232393434633431393731393038376366306635643561653036
+          3532323732633439323365333461303265383736353735390a623434643965306133656165326136
+          35366532306438366634633365363430336234663732313833383632363761653435313566356631
+          3233643031333439340a313337306331623131643334613138613232623466653639363566636666
+          3663
+        ansible_user: svc-srf-INTEU
+        ansible_password: "{{inte_service_user_prod_password}}"
+
+  vars:
+    ansible_connection: winrm
+    ansible_winrm_server_cert_validation: ignore
+    ansible_winrm_transport: ntlm
