@@ -39,6 +39,7 @@ jobs:
     runs-on: srf-inte-cargo
     timeout-minutes: 10
     env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ARTIFACT_TEMP_PATH: /home/github-runner/ansible/artifacts/${{ inputs.windowsServiceName }}/${{ inputs.version }}/${{ inputs.targetJarName }}
     steps:
 
@@ -51,14 +52,18 @@ jobs:
       - run: |
           jf rt dl ${{ inputs.repositoryPath }}/${{ inputs.version }}/*.jar $ARTIFACT_TEMP_PATH --flat --limit=1
 
+      - name: Fetch Inventory and Playbook
+        uses: actions/checkout@v4
+        with:
+          repository: mmz-srf/inte.devops.github-templates
+
       - name: Run Deployment
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          directory: /home/github-runner/ansible
-          playbook: playbook.yaml
+          playbook: ansible/playbook-deploy-on-windows.yaml
           vault_password: ${{secrets.INTE_ANSIBLE_VAULT_PASSWORD}}
           options: |
-            --inventory inventory.yaml
+            --inventory ansible/inventory.yaml
             --extra-vars "inventory_group_of_hosts=${{ inputs.ansibleInventory }} windows_service_name=${{ inputs.windowsServiceName }} jar_source_path=${{ env.ARTIFACT_TEMP_PATH }} artifact_version=${{ inputs.version }} target_jar_name=${{ inputs.targetJarName }} local_app_path=${{ inputs.windowsAppDirectory }}"
             --verbose
 
