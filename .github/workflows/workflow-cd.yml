@@ -75,6 +75,7 @@ jobs:
           namespace: '${{ inputs.deploymentNamespace }}'
           action: deploy
           private-cluster: false
+          skip-tls-verify: true
           manifests: |
             ${{ inputs.deploymentManifestsDirectory }}/
           images: 'registry.swisstxt.ch/srfop-proj-inte/${{ inputs.serviceName }}:${{ inputs.version }}'
