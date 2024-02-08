@@ -1,7 +1,16 @@
 # DevOps
 This Repo contains shared code for CI/CD
 
-### Ansible
 
-Falls der INTE Service User ein neues Passwort bekommt, muss im Inventory das Passwort angepasst werden. Dafür muss das neue Passwort zuerst mit dem Ansible-Vault verschlüsselt werden. Das Vault Passwort muss auf das Ansible Vault Passwort in Minidock gesetzt werden, damit der Github-Runner weiterhin das verschlüsselte Passwort des INTE-Service User während dem Ausführen des Playbook entschlüsseln kann.
-> ansible-vault encrypt_string '<pw-value>' --name '<pw-key>'
+## Erstinstallation/Wartung Windows Deployment
+Für das Windows deployment wird Ansible verwendet. 
+Das Ansible Playbook und Inventory befindet sich im Repo [devops.windows](https://github.com/mmz-srf/inte.devops.windows). 
+
+Damit das private Repo vom Runner ausgecheckt werden kann, müssen folgende Schritte vorgenommen werden.
+
+* [SSH key lokal generieren](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent#generating-a-new-ssh-key)
+* Public key als deployment key im [devops.windows](https://github.com/mmz-srf/inte.devops.windows) repo unter settings hinzufügen
+* Private key als [organisations secret](https://github.com/organizations/mmz-srf/settings/secrets/actions) mit namen `INTE_DEVOPS_WINDOWS_REPO_SSH_PRIVATE_KEY` für folgende Repos freigeben
+  * inte.srv.fileoperation
+  * 
+
