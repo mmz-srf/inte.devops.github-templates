@@ -57,15 +57,16 @@ jobs:
         with:
           repository: mmz-srf/inte.devops.windows
           ref: master
+          path: ansible
           ssh-key: ${{ secrets.INTE_DEVOPS_WINDOWS_REPO_SSH_PRIVATE_KEY }}
 
       - name: Run Deployment
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          playbook: ansible/playbook-deploy-on-windows.yaml
+          playbook: ansible/ansible/playbook-deploy-on-windows.yaml
           vault_password: ${{secrets.INTE_ANSIBLE_VAULT_PASSWORD}}
           options: |
-            --inventory ansible/inventory.yaml
+            --inventory ansible/ansible/inventory.yaml
             --extra-vars "inventory_group_of_hosts=${{ inputs.ansibleInventory }} windows_service_name=${{ inputs.windowsServiceName }} jar_source_path=${{ env.ARTIFACT_TEMP_PATH }} artifact_version=${{ inputs.version }} target_jar_name=${{ inputs.targetJarName }} local_app_path=${{ inputs.windowsAppDirectory }}"
             --verbose
 
