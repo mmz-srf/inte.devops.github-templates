@@ -12,5 +12,5 @@ Damit das private Repo vom Runner ausgecheckt werden kann, müssen folgende Schr
 * Public key als deployment key im [devops.windows](https://github.com/mmz-srf/inte.devops.windows) repo unter settings hinzufügen
 * Private key als [organisations secret](https://github.com/organizations/mmz-srf/settings/secrets/actions) mit namen `INTE_DEVOPS_WINDOWS_REPO_SSH_PRIVATE_KEY` für folgende Repos freigeben
   * inte.srv.fileoperation
-  * 
-
+  * inte.srv.watermarksacn
+  * inte.srv.watchservice
