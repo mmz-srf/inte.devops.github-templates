@@ -33,6 +33,8 @@ on:
         required: true
       INTE_ANSIBLE_VAULT_PASSWORD:
         required: true
+      INTE_DEVOPS_WINDOWS_REPO_SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   deploy-to-vm:
