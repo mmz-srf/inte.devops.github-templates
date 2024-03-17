@@ -24,6 +24,12 @@ on:
       deploymentManifestsDirectory:
         type: string
         default: "./deployment"
+      bpmnExport:
+        type: boolean
+        default: false
+      bpmnSourceDirectory:
+        type: string
+        default: "src/main/resources/bpmn"
     secrets:
       INTE_CARGO_URL:
         required: true
@@ -37,6 +43,14 @@ jobs:
     steps:
       - name: Checkout project sources
         uses: actions/checkout@v3
+
+      - name: Export BPMN
+        id: export-bpmn
+        uses: mmz-srf/inte.devops.github-actions.bpmn-exporter@main
+        if: inputs.bpmnExport
+        with:
+          sourceDirectory: ${{ inputs.bpmnSourceDirectory }}
+          targetDirectory: /data/${{ inputs.serviceName }}
 
       - name: Set environment specific variables
         run: |
