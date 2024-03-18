@@ -44,6 +44,9 @@ jobs:
       - name: Checkout project sources
         uses: actions/checkout@v3
 
+      - name: Install dependencies
+        run: npm install -g puppeteer
+
       - name: Export BPMN
         id: export-bpmn
         uses: mmz-srf/inte.devops.github-actions.bpmn-exporter@main
