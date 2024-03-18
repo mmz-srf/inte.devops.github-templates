@@ -54,7 +54,7 @@ jobs:
 
       - name: Export BPMN
         id: export-bpmn
-        uses: mmz-srf/inte.devops.github-actions.bpmn-exporter@main
+        uses: mmz-srf/inte.devops.github-actions.bpmn-exporter@0.0.1
         if: inputs.bpmnExport
         env:
           PUPPETEER_CACHE_DIR: /home/github-runner-work/cache/puppeteer
