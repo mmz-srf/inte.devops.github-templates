@@ -56,8 +56,6 @@ jobs:
         id: export-bpmn
         uses: mmz-srf/inte.devops.github-actions.bpmn-exporter@main
         if: inputs.bpmnExport
-        env:
-          PUPPETEER_CACHE_DIR: /home/github-runner-work/cache/puppeteer
         with:
           sourceDirectory: ${{ inputs.bpmnSourceDirectory }}
           targetDirectory: /data/${{ inputs.serviceName }}
