@@ -57,7 +57,7 @@ jobs:
       - name: Checkout ansible playbook
         uses: actions/checkout@v4
         with:
-          repository: mmz-srf/inte.devops.windows
+          repository: mmz-srf/inte.infra.ansible
           token: false
           ref: master
           path: ansible
