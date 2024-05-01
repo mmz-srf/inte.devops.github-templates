@@ -5,10 +5,12 @@
 
 # Gradle
 .gradle/
+gradle
+gradlew
+gradlew.bat
 
 # Package Files #
 *.jar
-!*gradle-wrapper.jar        # include gradle-wrapper
 *.zip
 *.tar.gz
 *.rar
