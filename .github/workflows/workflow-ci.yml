@@ -11,7 +11,7 @@ on:
         default: false
       javaVersion:
         type: number
-        default: 17
+        default: 21
       gradleBuildTasks:
         type: string
         default: "--info clean build test"
