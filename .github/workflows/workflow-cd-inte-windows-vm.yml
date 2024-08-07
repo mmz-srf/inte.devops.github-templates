@@ -46,7 +46,7 @@ jobs:
     steps:
 
       - name: Download JAR
-        uses: jfrog/setup-jfrog-cli@v3
+        uses: jfrog/setup-jfrog-cli@v4
         env:
           JF_URL: https://maven.admin.srf.ch
           JF_ACCESS_TOKEN: ${{ secrets.INTE_JFROG_ARTIFACT_TOKEN }}
