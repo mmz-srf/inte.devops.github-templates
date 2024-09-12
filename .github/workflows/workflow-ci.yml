@@ -1,5 +1,10 @@
 name: Build & Test Gradle project
 
+permissions:
+  contents: read        # allow reading commits
+  checks: write         # allow writing test results
+  pull-requests: write  # allow updating pull-request with test results
+  
 on:
   workflow_call:
     inputs:
