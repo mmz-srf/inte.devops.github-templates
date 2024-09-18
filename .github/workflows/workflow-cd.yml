@@ -12,15 +12,9 @@ on:
         description: 'Release version'
         type: string
         required: true
-      serviceName:
-        type: string
-        required: true
       deploymentNamespace:
         type: string
         required: true
-      enableTracing:
-        type: boolean
-        default: true
       deploymentManifestsDirectory:
         type: string
         default: "./deployment"
@@ -60,7 +54,6 @@ jobs:
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
-          enableTracing: ${{ inputs.enableTracing }}
 
       - name: Login to cluster with service-account
         uses: azure/k8s-set-context@v3
@@ -78,4 +71,3 @@ jobs:
           skip-tls-verify: true
           manifests: |
             ${{ inputs.deploymentManifestsDirectory }}/
-          images: 'registry.swisstxt.ch/srfop-proj-inte/${{ inputs.serviceName }}:${{ inputs.version }}'
