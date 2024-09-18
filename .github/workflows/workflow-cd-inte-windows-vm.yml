@@ -2,9 +2,11 @@ name: Release
 run-name: Release ${{ inputs.version }} on ${{ inputs.ansibleInventory }}
 
 permissions:
-  contents: read        # allow reading commits
+  contents: write       # allow reading commits
   checks: write         # allow writing test results
   pull-requests: write  # allow updating pull-request with test results
+  actions: write 
+  deployments: write
 
 on:
   workflow_call:
