@@ -64,7 +64,8 @@ jobs:
 
       - name: Deploy app to cluster
         run: |
-          k version --short
+          kubectl version --short
+          kubectl -n inte-angebot get pods
           echo "Deploy app to namespace $INPUT_DEPLOYMENTNAMESPACE"
           if [[ $INPUT_DEPLOYMENTNAMESPACE ]]
           then
