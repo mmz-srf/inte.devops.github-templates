@@ -63,11 +63,14 @@ jobs:
           k8s-secret: ${{ secrets.INTE_CARGO_SECRET }}
 
       - name: Deploy app to cluster
-        uses: Azure/k8s-deploy@v4
-        with:
-          namespace: '${{ inputs.deploymentNamespace }}'
-          action: deploy
-          private-cluster: false
-          skip-tls-verify: true
-          manifests: |
-            ${{ inputs.deploymentManifestsDirectory }}/
+        run: |
+          k version --short
+          echo "Deploy app to namespace $INPUT_DEPLOYMENTNAMESPACE"
+          if [[ $INPUT_DEPLOYMENTNAMESPACE ]]
+          then
+            echo "Deployment to one namespace"
+          else
+            echo "Deployment to multiple namespace"
+          fi
+          env | sort
+        
