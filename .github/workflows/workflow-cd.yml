@@ -63,15 +63,18 @@ jobs:
           k8s-secret: ${{ secrets.INTE_CARGO_SECRET }}
 
       - name: Deploy app to cluster
+        env:
+          DEPLOYMENT_NAMESPACE: ${{ inputs.deploymentNamespace }}
         run: |
           kubectl version
           kubectl -n inte-angebot get pods
-          echo "Deploy app to namespace $INPUT_DEPLOYMENTNAMESPACE"
-          if [[ $INPUT_DEPLOYMENTNAMESPACE ]]
+          env | sort
+          echo "Deploy app to namespace $DEPLOYMENT_NAMESPACE"
+          if [[ $DEPLOYMENT_NAMESPACE ]]
           then
             echo "Deployment to one namespace"
           else
             echo "Deployment to multiple namespace"
           fi
-          env | sort
+          
         
