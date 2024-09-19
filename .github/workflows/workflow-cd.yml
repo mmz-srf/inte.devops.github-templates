@@ -14,7 +14,6 @@ on:
         required: true
       deploymentNamespace:
         type: string
-        required: true
       deploymentManifestsDirectory:
         type: string
         default: "./deployment"
@@ -65,16 +64,19 @@ jobs:
       - name: Deploy app to cluster
         env:
           DEPLOYMENT_NAMESPACE: ${{ inputs.deploymentNamespace }}
+          DEPLOYMENT_MANIFEST_DIRECTORY: ${{ inputs.deploymentManifestsDirectory }}
         run: |
           kubectl version
           kubectl -n inte-angebot get pods
           env | sort
-          echo "Deploy app to namespace $DEPLOYMENT_NAMESPACE"
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
-            echo "Deployment to one namespace"
+            echo "Deploy app to namespace $DEPLOYMENT_NAMESPACE"
+            kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY --dry-run -oyaml
           else
-            echo "Deployment to multiple namespace"
+            echo "Deploy with kustomize the following resources"
+            kubectl kustomize ./kustomize
+            kubectl apply -k ./kustomize --dry-run
           fi
           
         
