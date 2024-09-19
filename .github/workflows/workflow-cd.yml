@@ -74,7 +74,7 @@ jobs:
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
             deployment_name=$(kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY --dry-run -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
             echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
-            kubectl -n $DEPLOYMENT_NAMESPACE rollout status $deployment_name 
+            kubectl -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
           else
             echo "Deploy with kustomize the following resources"
             kubectl kustomize ./kustomize
@@ -83,7 +83,7 @@ jobs:
               ns=$( echo "$deployment" | cut -f1 -d ',')
               deployment_name=$( echo "$deployment" | cut -f2 -d ',')
               echo "Wait until deployment $deployment_name in namespace $ns finishes"
-              kubectl -n $ns rollout status $deployment_name
+              kubectl -n $ns --dry-run=client rollout status Deployment/$deployment_name
             done
           fi
         
