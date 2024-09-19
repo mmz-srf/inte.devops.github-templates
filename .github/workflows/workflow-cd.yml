@@ -80,7 +80,6 @@ jobs:
             kubectl kustomize ./kustomize
             deployments=$(kubectl apply -k ./kustomize --dry-run -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
             for deployment in $deployments ; do
-            do
               ns=$( echo "$deployment" | cut -f1 -d ',')
               deployment_name=$( echo "$deployment" | cut -f2 -d ',')
               echo "Wait until deployment $deployment_name in namespace $ns finishes"
