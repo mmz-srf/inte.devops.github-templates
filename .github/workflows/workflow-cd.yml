@@ -49,7 +49,7 @@ jobs:
         with:
           tokenPrefix: '#{'
           tokenSuffix: '}#'
-          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml"]'
+          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml", "./kustomize/*.yaml"]'
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
@@ -78,10 +78,11 @@ jobs:
           else
             echo "Deploy with kustomize the following resources"
             kubectl kustomize ./kustomize
-            for deployment in $(kubectl apply -k ./kustomize --dry-run -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
+            deployments=$(kubectl apply -k ./kustomize --dry-run -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
+            for deployment in $deployments ; do
             do
-              ns=$("$deployment" | cut -f1 -d ',')
-              deployment_name=$("$deployment" | cut -f2 -d ',')
+              ns=$( echo "$deployment" | cut -f1 -d ',')
+              deployment_name=$( echo "$deployment" | cut -f2 -d ',')
               echo "Wait until deployment $deployment_name in namespace $ns finishes"
               kubectl -n $ns rollout status $deployment_name
             done
