@@ -49,7 +49,7 @@ jobs:
         with:
           tokenPrefix: '#{'
           tokenSuffix: '}#'
-          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml", "./kustomize/*.yaml"]'
+          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml", "./kustomize/**/*.yaml"]'
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
