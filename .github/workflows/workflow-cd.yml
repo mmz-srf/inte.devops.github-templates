@@ -25,7 +25,7 @@ on:
 jobs:
   deploy-to-cluster:
     runs-on: srf-inte-cargo
-    timeout-minutes: 10
+    timeout-minutes: 30
 
     steps:
       - name: Checkout project sources
