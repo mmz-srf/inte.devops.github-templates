@@ -17,6 +17,10 @@ on:
       deploymentManifestsDirectory:
         type: string
         default: "./deployment"
+      jobTimeout:
+        type: number
+        description: 'Timeout for job in minutes'
+        default: 10
     secrets:
       INTE_CARGO_URL:
         required: true
@@ -25,7 +29,7 @@ on:
 jobs:
   deploy-to-cluster:
     runs-on: srf-inte-cargo
-    timeout-minutes: 30
+    timeout-minutes: ${{ inputs.jobTimeout }}
 
     steps:
       - name: Checkout project sources
@@ -70,12 +74,14 @@ jobs:
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
+            # Ignore exit code in diff, as when there is a diff exit code is always not 0
             kubectl -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
             deployment_name=$(kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
             echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
             kubectl -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
           else
             echo "Deploy with kustomize the following resources"
+            # Ignore exit code in diff, as when there is a diff exit code is always not 0
             kubectl diff -k ./kustomize || true
             deployments=$(kubectl apply -k ./kustomize -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
             for deployment in $deployments ; do
