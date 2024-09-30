@@ -67,12 +67,10 @@ jobs:
           DEPLOYMENT_MANIFEST_DIRECTORY: ${{ inputs.deploymentManifestsDirectory }}
         run: |
           kubectl version
-          kubectl -n inte-angebot get pods
-          env | sort
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
-            kubectl -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY
+            kubectl -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
             deployment_name=$(kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
             echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
             kubectl -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
