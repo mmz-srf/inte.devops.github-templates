@@ -71,8 +71,8 @@ jobs:
           DEPLOYMENT_MANIFEST_DIRECTORY: ${{ inputs.deploymentManifestsDirectory }}
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          kubectl $global_options version
           global_options="--insecure-skip-tls-verify=true"
+          kubectl $global_options version
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
