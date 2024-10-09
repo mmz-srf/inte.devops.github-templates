@@ -71,7 +71,7 @@ jobs:
           DEPLOYMENT_MANIFEST_DIRECTORY: ${{ inputs.deploymentManifestsDirectory }}
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
-          kubectl version
+          kubectl $global_options version
           global_options="--insecure-skip-tls-verify=true"
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
