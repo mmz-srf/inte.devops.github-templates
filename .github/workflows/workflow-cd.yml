@@ -72,25 +72,26 @@ jobs:
           ENVIRONMENT: ${{ inputs.environment }}
         run: |
           kubectl version
+          global_options="--insecure-skip-tls-verify=true"
           if [[ $DEPLOYMENT_NAMESPACE ]]
           then
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
             # Ignore exit code in diff, as when there is a diff exit code is always not 0
-            kubectl -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
-            deployment_name=$(kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
+            kubectl $global_options -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
+            deployment_name=$(kubectl $global_options -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
             echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
-            kubectl -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
+            kubectl $global_options -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
           else
             echo "Deploy with kustomize the following resources"
             kustomize_dir=./kustomize/overlays/${ENVIRONMENT}
             # Ignore exit code in diff, as when there is a diff exit code is always not 0
-            kubectl diff -k ${kustomize_dir} || true
-            deployments=$(kubectl apply -k ${kustomize_dir} -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
+            kubectl $global_options diff -k ${kustomize_dir} || true
+            deployments=$(kubectl $global_options apply -k ${kustomize_dir} -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
             for deployment in $deployments ; do
               ns=$( echo "$deployment" | cut -f1 -d ',')
               deployment_name=$( echo "$deployment" | cut -f2 -d ',')
               echo "Wait until deployment $deployment_name in namespace $ns finishes"
-              kubectl -n $ns rollout status Deployment/$deployment_name
+              kubectl $global_options -n $ns rollout status Deployment/$deployment_name
             done
           fi
         
