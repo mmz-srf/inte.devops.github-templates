@@ -12,18 +12,15 @@ on:
         description: 'Release version'
         type: string
         required: true
-      serviceName:
-        type: string
-        required: true
       deploymentNamespace:
         type: string
-        required: true
-      enableTracing:
-        type: boolean
-        default: true
       deploymentManifestsDirectory:
         type: string
         default: "./deployment"
+      jobTimeout:
+        type: number
+        description: 'Timeout for job in minutes'
+        default: 10
     secrets:
       INTE_CARGO_URL:
         required: true
@@ -32,7 +29,7 @@ on:
 jobs:
   deploy-to-cluster:
     runs-on: srf-inte-cargo
-    timeout-minutes: 10
+    timeout-minutes: ${{ inputs.jobTimeout }}
 
     steps:
       - name: Checkout project sources
@@ -56,11 +53,10 @@ jobs:
         with:
           tokenPrefix: '#{'
           tokenSuffix: '}#'
-          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml"]'
+          files: '["${{ inputs.deploymentManifestsDirectory }}/*.yaml", "${{ inputs.deploymentManifestsDirectory }}/*.yml", "./kustomize/**/*.yaml"]'
         env:
           environment: ${{ inputs.environment }}
           version: ${{ inputs.version }}
-          enableTracing: ${{ inputs.enableTracing }}
 
       - name: Login to cluster with service-account
         uses: azure/k8s-set-context@v3
@@ -70,12 +66,31 @@ jobs:
           k8s-secret: ${{ secrets.INTE_CARGO_SECRET }}
 
       - name: Deploy app to cluster
-        uses: Azure/k8s-deploy@v4
-        with:
-          namespace: '${{ inputs.deploymentNamespace }}'
-          action: deploy
-          private-cluster: false
-          skip-tls-verify: true
-          manifests: |
-            ${{ inputs.deploymentManifestsDirectory }}/
-          images: 'registry.swisstxt.ch/srfop-proj-inte/${{ inputs.serviceName }}:${{ inputs.version }}'
+        env:
+          DEPLOYMENT_NAMESPACE: ${{ inputs.deploymentNamespace }}
+          DEPLOYMENT_MANIFEST_DIRECTORY: ${{ inputs.deploymentManifestsDirectory }}
+          ENVIRONMENT: ${{ inputs.environment }}
+        run: |
+          kubectl version
+          if [[ $DEPLOYMENT_NAMESPACE ]]
+          then
+            echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
+            # Ignore exit code in diff, as when there is a diff exit code is always not 0
+            kubectl -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
+            deployment_name=$(kubectl -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
+            echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
+            kubectl -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
+          else
+            echo "Deploy with kustomize the following resources"
+            kustomize_dir=./kustomize/overlays/${ENVIRONMENT}
+            # Ignore exit code in diff, as when there is a diff exit code is always not 0
+            kubectl diff -k ${kustomize_dir} || true
+            deployments=$(kubectl apply -k ${kustomize_dir} -ojson | jq -r '.items[] | select(.kind == "Deployment") | "\(.metadata.namespace),\(.metadata.name)"')
+            for deployment in $deployments ; do
+              ns=$( echo "$deployment" | cut -f1 -d ',')
+              deployment_name=$( echo "$deployment" | cut -f2 -d ',')
+              echo "Wait until deployment $deployment_name in namespace $ns finishes"
+              kubectl -n $ns rollout status Deployment/$deployment_name
+            done
+          fi
+        
