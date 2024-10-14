@@ -77,10 +77,14 @@ jobs:
           then
             echo "Update K8s resources in namespace $DEPLOYMENT_NAMESPACE"
             # Ignore exit code in diff, as when there is a diff exit code is always not 0
+            echo "K8s resource diff"
             kubectl $global_options -n $DEPLOYMENT_NAMESPACE diff -f $DEPLOYMENT_MANIFEST_DIRECTORY || true
-            deployment_name=$(kubectl $global_options -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
-            echo "Wait until deployment $deployment_name in namespace $DEPLOYMENT_NAMESPACE finishes"
-            kubectl $global_options -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment_name 
+            echo "Deploy K8s resource in namespace $DEPLOYMENT_NAMESPACE"
+            deployments=$(kubectl $global_options -n $DEPLOYMENT_NAMESPACE apply -f $DEPLOYMENT_MANIFEST_DIRECTORY -ojson | jq -r '.items[] | select(.kind == "Deployment") | .metadata.name')
+            for deployment in $deployments ; do
+              echo "Wait until deployment $deployment in namespace $DEPLOYMENT_NAMESPACE finishes"
+              kubectl $global_options -n $DEPLOYMENT_NAMESPACE rollout status Deployment/$deployment 
+            done
           else
             echo "Deploy with kustomize the following resources"
             kustomize_dir=./kustomize/overlays/${ENVIRONMENT}
