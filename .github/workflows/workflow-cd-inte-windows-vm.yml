@@ -31,8 +31,6 @@ on:
     secrets:
       INTE_JFROG_ARTIFACT_TOKEN:
         required: true
-      INTE_ANSIBLE_VAULT_PASSWORD:
-        required: true
       INTE_DEVOPS_WINDOWS_REPO_SSH_PRIVATE_KEY:
         required: true
 
@@ -67,7 +65,7 @@ jobs:
         uses: dawidd6/action-ansible-playbook@v2
         with:
           playbook: ansible/ansible/playbook-deploy-on-windows.yaml
-          vault_password: ${{secrets.INTE_ANSIBLE_VAULT_PASSWORD}}
+          vault_password: /home/github-runner/ansible-vault-pw
           options: |
             --inventory ansible/ansible/inventory.yaml
             --extra-vars "inventory_group_of_hosts=${{ inputs.ansibleInventory }} windows_service_name=${{ inputs.windowsServiceName }} jar_source_path=${{ env.ARTIFACT_TEMP_PATH }} artifact_version=${{ inputs.version }} target_jar_name=${{ inputs.targetJarName }} local_app_path=${{ inputs.windowsAppDirectory }}"
