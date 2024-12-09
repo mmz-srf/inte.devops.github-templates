@@ -4,6 +4,7 @@ permissions:
   contents: read        # allow reading commits
   checks: write         # allow writing test results
   pull-requests: write  # allow updating pull-request with test results
+  packages: write       # allow publishing new release packages
   
 on:
   workflow_call:
