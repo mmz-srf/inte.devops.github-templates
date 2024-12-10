@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GITHUB_TOKEN: ${{ secrets.INTE_GITHUB_ARTIFACT_TOKEN }}
       INTE_JFROG_ARTIFACT_TOKEN: ${{ secrets.INTE_JFROG_ARTIFACT_TOKEN }}
       AZURE_ARTIFACTS_ENV_ACCESS_TOKEN: ${{ secrets.INTE_AZURE_ARTIFACT_TOKEN }}
 
@@ -63,7 +63,6 @@ jobs:
       run: ./gradlew ${{ inputs.gradleBuildTasks }}
       env:
         GITHUB_ACTOR: "fabian-gerber"
-        GITHUB_TOKEN: ${{ secrets.INTE_GITHUB_ARTIFACT_TOKEN }}
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
