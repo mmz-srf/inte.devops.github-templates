@@ -61,6 +61,9 @@ jobs:
     ## Build
     - name: Build & Test
       run: ./gradlew ${{ inputs.gradleBuildTasks }}
+      env:
+        GITHUB_ACTOR: "fabian-gerber"
+        GITHUB_TOKEN: ${{ secrets.INTE_GITHUB_ARTIFACT_TOKEN }}
 
     - uses: EnricoMi/publish-unit-test-result-action@v2
       if: always()
